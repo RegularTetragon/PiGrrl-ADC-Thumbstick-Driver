@@ -1,2 +1,7 @@
-driver: driver.c
-	gcc -Wall -o driver driver.c -lwiringPi
+./bin/driver: ./src/driver.c
+	gcc -Wall -o ./bin/driver ./src/driver.c -lwiringPi
+
+run: ./bin/driver
+	./bin/driver
+clean:
+	rm ./bin/driver
