@@ -1,7 +1,7 @@
-./bin/driver: ./src/driver.c
-	gcc -Wall -g -o ./bin/driver ./src/driver.c -lwiringPi
+./bin/tester: ./src/pigrrlread.c
+	gcc -Wall -g -o ./bin/tester ./src/tester.c ./src/pigrrlread.c -lwiringPi
 
-run: ./bin/driver
-	./bin/driver
+tester: ./bin/tester
+	./bin/tester
 clean:
-	rm ./bin/driver
+	rm ./bin/*
