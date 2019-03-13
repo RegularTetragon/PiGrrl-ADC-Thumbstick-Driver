@@ -1,4 +1,12 @@
+
+#pragma once
+
+#ifdef __KERNEL__
+#include <linux/types.h>
+#endif
+#ifndef __KERNEL__
 #include <inttypes.h>
+#endif
 
 #define ADS_ADDRESS 0x48
 #define ADS_BASE 2222
@@ -85,8 +93,7 @@ struct pigrrl2_controller_config {
 	struct ads_axis_config y1;
 };
 
-void wiringPiInit();
+void wiringPiInit(void);
 void pigrrl2_config_calibrate(struct pigrrl2_controller_config *out);
 void pigrrl2_controller_read(struct pigrrl2_controller_state *out, struct pigrrl2_controller_config *config);
-void pigrrl2_controller_state_print(const struct pigrrl2_controller_state *state);
 void pigrrl2_controller_init(struct pigrrl2_controller_state *out);

@@ -1,15 +1,21 @@
 
 //From standard library
-#include <stdio.h>
 #include <stdbool.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <time.h>
-#include <inttypes.h>
-#include <errno.h>
+
+#ifndef __KERNEL__
+	#include <string.h>
+	#include <stdio.h>
+	#include <stdlib.h>
+	#include <inttypes.h>
+	#include <unistd.h>
+#endif
+#ifdef __KERNEL__
+	#include <linux/module.h>
+	#include <linux/types.h>
+	#include <linux/delay.h>
+	#include <linux/string.h>
+#endif
+
 //From wiringPi
 #include <ads1115.h>
 #include <wiringPi.h>
@@ -35,22 +41,17 @@ struct ads_axis_config* ads_axis_to_config_axis(int axis_id, struct pigrrl2_cont
 			return &(config->y1);
 		break;
 		default:
+			#ifndef __KERNEL__
 			fprintf(stderr, "Invalid axis ID\n");
 			exit(ERR_BAD_AXIS_ID);
+			#else
+			printk(KERN_ERR "Invalid axis ID\n");
+			#endif
+
 		break;
 	}
 }
 
-void pigrrl2_controller_state_print(const struct pigrrl2_controller_state *state) {
-	printf(
-		"Buttons: %x Left stick: <%f, %f> Right stick: <%f, %f>\n",
-		state->buttons,
-		(float)state->leftstick.x / INT16_MAX,
-		(float)state->leftstick.y / INT16_MAX,
-		(float)state->rightstick.x / INT16_MAX,
-		(float)state->rightstick.y / INT16_MAX
-	);
-}
 
 void pigrrl2_controller_init(struct pigrrl2_controller_state *out) {
 	out->buttons = PIGRRL_NOP;
@@ -78,7 +79,6 @@ void pigrrl2_controller_read_btns(struct pigrrl2_controller_state *out) {
 //	Actively recalibrates the joystick if you go out of range. Does not account for drift.
 int16_t ads_axis_to_controller_axis(uint16_t axis_value, int axis_id, struct pigrrl2_controller_config *config) {
 	struct ads_axis_config *axis_config = ads_axis_to_config_axis(axis_id, config);
-	assert(axis_config->max != axis_config->min);
 	int32_t out = ((int32_t)axis_value - axis_config->neutral) * (int32_t)axis_config->max / (int32_t)axis_config->min;
 	if (out > INT16_MAX) {
 		axis_config->max = axis_value;
