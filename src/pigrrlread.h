@@ -3,10 +3,10 @@
 
 #ifdef __KERNEL__
 #include <linux/types.h>
-#endif
-#ifndef __KERNEL__
+#else
 #include <inttypes.h>
 #endif
+#include <stdbool.h>
 
 #define ADS_ADDRESS 0x48
 #define ADS_BASE 2222
@@ -17,10 +17,11 @@
 #define AXIS_Y1 ADS_BASE + 3
 static const int ADS_AXES[ADS_AXIS_COUNT] = { AXIS_X0, AXIS_Y0, AXIS_X1, AXIS_Y1 };
 
-#define ERR_NO_JOYSTICK 1
-#define ERR_BAD_AXIS_ID 2
-#define MAX_FRAME_EVENTS 4
-
+#define ERR_NO_JOYSTICK 	1
+#define ERR_BAD_AXIS_ID 	2
+#define ERR_FILE_OPEN_FAILURE 	3
+#define ERR_FILE_READ_FAILURE 	4
+#define ERR_FILE_WRITE_FAILURE 	5
 
 #define PIGRRL_NOP 	0
 #define PIGRRL_A 	1 << 0
@@ -39,6 +40,8 @@ static const int ADS_AXES[ADS_AXIS_COUNT] = { AXIS_X0, AXIS_Y0, AXIS_X1, AXIS_Y1
 #define PIGRRL_TFT_2 	1 << 13
 #define PIGRRL_TFT_3 	1 << 14
 #define PIGRRL_TFT_4 	1 << 15
+
+#define PIGRRL_CONFIG_PATH "./calibration.dat"
 
 #define BTN_COUNT 16
 #define BTN_MAP_PIN 0
@@ -93,7 +96,9 @@ struct pigrrl2_controller_config {
 	struct ads_axis_config y1;
 };
 
+
 void wiringPiInit(void);
 void pigrrl2_config_calibrate(struct pigrrl2_controller_config *out);
+bool pigrrl2_config_load(struct pigrrl2_controller_config *out);
 void pigrrl2_controller_read(struct pigrrl2_controller_state *out, struct pigrrl2_controller_config *config);
 void pigrrl2_controller_init(struct pigrrl2_controller_state *out);

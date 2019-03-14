@@ -8,8 +8,11 @@
 	#include <stdlib.h>
 	#include <inttypes.h>
 	#include <unistd.h>
-#endif
-#ifdef __KERNEL__
+	#include <errno.h>
+	#include <string.h>
+	#include <sys/stat.h>
+	#include <fcntl.h>
+#else
 	#include <linux/module.h>
 	#include <linux/types.h>
 	#include <linux/delay.h>
@@ -21,6 +24,7 @@
 #include <wiringPi.h>
 //From project
 #include "pigrrlread.h"
+#include "pigrrlads.h"
 
 
 
@@ -103,44 +107,27 @@ void pigrrl2_controller_read(struct pigrrl2_controller_state *out, struct pigrrl
 	pigrrl2_controller_read_analog(out, config);
 }
 
-void pigrrl2_config_default(struct pigrrl2_controller_config *out) {
-	for (int axis = 0; axis < ADS_AXIS_COUNT; axis += 1) {
-		int axis_id = ADS_AXES[axis];
-		struct ads_axis_config *axis_config = ads_axis_to_config_axis(axis_id, out);
-		axis_config->max = 0;
-		axis_config->min = UINT16_MAX;
+
+
+
+bool pigrrl2_config_load(struct pigrrl2_controller_config *config) {
+	int f = open(PIGRRL_CONFIG_PATH, O_RDONLY);
+	if (f != -1) {
+		read(f, config, sizeof(struct pigrrl2_controller_config));
+		if (errno) {
+			fprintf(stderr, "Failed to read file %s. Error: %s.\n", PIGRRL_CONFIG_PATH, strerror(errno));
+			return false;
+		}
 	}
+	else {
+		fprintf(stderr, "Failed to open file for writing %s. Error: %s.\n", PIGRRL_CONFIG_PATH, strerror(errno));
+		return false;
+	}
+	return true;
+
 }
 
-//TODO: Add deadzone
-void pigrrl2_config_calibrate_neutral(struct pigrrl2_controller_config *out) {
-	printf("Please don't touch the thumbsticks...\n");
-	for (int axis = 0; axis < ADS_AXIS_COUNT; axis += 1) {
-		int axis_id = ADS_AXES[axis];
-		struct ads_axis_config *axis_config = ads_axis_to_config_axis(axis_id, out);
-		uint16_t axis_value = analogRead(axis_id);
-		axis_config->neutral = axis_value;
-	}
-}
-void pigrrl2_config_calibrate_bounds(struct pigrrl2_controller_config *out) {
-	printf("Joystick calibration, move the thumbsticks in a circle. Press the A button when finished.\n");
-	while (digitalRead(14)) {
-		for (int axis = 0; axis < ADS_AXIS_COUNT; axis += 1) {
-			int axis_id = ADS_AXES[axis];
-			struct ads_axis_config *axis_config = ads_axis_to_config_axis(axis_id, out);
-			uint16_t axis_value = analogRead(axis_id);
-			axis_config->max = axis_value > axis_config->max ? axis_value : axis_config->max;
-			axis_config->min = axis_value < axis_config->min ? axis_value : axis_config->min;
-		}
-		usleep(FRAME_PERIOD);
-	}
-	printf("Done.");
-}
-void pigrrl2_config_calibrate(struct pigrrl2_controller_config *out) {
-	pigrrl2_config_default(out);
-	pigrrl2_config_calibrate_neutral(out);
-	pigrrl2_config_calibrate_bounds(out);
-}
+
 
 void wiringPiInit() {
 	wiringPiSetupGpio();

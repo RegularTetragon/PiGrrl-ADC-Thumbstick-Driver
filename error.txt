@@ -1,0 +1,10 @@
+./src/pigrrlcalibrate.c: In function 'pigrrl2_config_calibrate':
+./src/pigrrlcalibrate.c:60:2: warning: implicit declaration of function 'pigrrl2_config_default' [-Wimplicit-function-declaration]
+  pigrrl2_config_default(out);
+  ^~~~~~~~~~~~~~~~~~~~~~
+./src/pigrrlcalibrate.c: In function 'main':
+./src/pigrrlcalibrate.c:73:10: error: 'ERR_WRITE_FILE_FAILURE' undeclared (first use in this function)
+   return ERR_WRITE_FILE_FAILURE;
+          ^~~~~~~~~~~~~~~~~~~~~~
+./src/pigrrlcalibrate.c:73:10: note: each undeclared identifier is reported only once for each function it appears in
+make: *** [bin/calibrator] Error 1
