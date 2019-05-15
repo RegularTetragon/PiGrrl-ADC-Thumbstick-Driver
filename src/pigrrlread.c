@@ -67,8 +67,11 @@ void pigrrl2_controller_init(struct pigrrl2_controller_state *out) {
 void pigrrl2_controller_read_btns(struct pigrrl2_controller_state *out) {
 	out->buttons = PIGRRL_NOP;
 	for (int i=0; i < BTN_COUNT; i+=1) {
+		int pin = PIGRRL_BTN_MAP[i][0];
+		pinMode(pin, INPUT);
+		pullUpDnControl(pin, PUD_UP);
 		//PiGrrl buttons are 0 hot
-		if(!digitalRead(PIGRRL_BTN_MAP[i][BTN_MAP_PIN])) {
+		if(!digitalRead(pin)) {
 			out->buttons |= PIGRRL_BTN_MAP[i][BTN_MAP_KEY];
 		}
 	}

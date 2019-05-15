@@ -51,8 +51,8 @@ void pigrrl2_config_calibrate_neutral(struct pigrrl2_controller_config *out) {
 	}
 }
 void pigrrl2_config_calibrate_bounds(struct pigrrl2_controller_config *out) {
-	printf("Joystick calibration, move the thumbsticks in a circle. Press the A button when finished.\n");
-	while (digitalRead(14)) {
+	printf("Joystick calibration, move the thumbsticks in a circle. Press the B button when finished.\n");
+	while (digitalRead(PIGRRL_START)) {
 		for (int axis = 0; axis < ADS_AXIS_COUNT; axis += 1) {
 			int axis_id = ADS_AXES[axis];
 			struct ads_axis_config *axis_config = ads_axis_to_config_axis(axis_id, out);
