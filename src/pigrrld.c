@@ -26,28 +26,28 @@ void set_axis_data(int fd, int axis_code) {
 	setup.absinfo.minimum = INT16_MIN;
 	setup.absinfo.flat    = 0;
 	setup.absinfo.fuzz    = 5;
-	ioctl(fd, UI_ABS_SETUP, &setup);
+	if (ioctl(fd, UI_ABS_SETUP, &setup) < 0) fprintf(stderr, "Failed to setup axis: %s\n", strerror(errno));
 }
 
 int init_usetup(struct uinput_setup *usetup) {
-	int fd = open("/dev/uinput", O_WRONLY | O_NONBLOCK) && "Failed to open uinput.";
+	int fd = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
 	if (fd < 0) {
 		fprintf(stderr, "Failed to open uinput: %s\n", strerror(errno));
 		exit(1);
 	}
 
 	//Initialize button outputs
-	ioctl(fd, UI_SET_EVBIT, EV_ABS);
+	if(ioctl(fd, UI_SET_EVBIT, EV_KEY)) printf("Error setting evbit to key: %s\n", strerror(errno));
 	for (int i=0;i<BTN_COUNT;i++) {
-		ioctl(fd, UI_SET_KEYBIT, PIGRRL_BTN_MAP[i][2]);
+		if(ioctl(fd, UI_SET_KEYBIT, PIGRRL_BTN_MAP[i][2]) < 0) printf("Error Setting Button: %s", strerror(errno));
 	}
 
 	//Initialize analog outputs
 	ioctl(fd, UI_SET_EVBIT, EV_ABS);
-	ioctl(fd, UI_SET_RELBIT, REL_X);
-	ioctl(fd, UI_SET_RELBIT, REL_Y);
-	ioctl(fd, UI_SET_RELBIT, REL_RX);
-	ioctl(fd, UI_SET_RELBIT, REL_RY);
+	if (ioctl(fd, UI_SET_RELBIT, REL_X) < 0) printf("Error Axis X: %s\n", strerror(errno));
+	if (ioctl(fd, UI_SET_RELBIT, REL_Y) < 0) printf("Error Axis Y: %s\n", strerror(errno));
+	if (ioctl(fd, UI_SET_RELBIT, REL_RX) < 0) printf("Error Axis RX: %s\n", strerror(errno));
+	if (ioctl(fd, UI_SET_RELBIT, REL_RY) < 0) printf("Error Axis RY: %s\n", strerror(errno));
 
 	//Blank the usetup and initialize it
 	memset(usetup, 0, sizeof(*usetup));
@@ -91,16 +91,25 @@ void emit(int fd, int type, int code, int val) {
 }
 
 void writeChanges(int fd, struct pigrrl2_controller_state *previous, struct pigrrl2_controller_state *current) {
+	printf("Checking changes. Previous: \n");
+	pigrrl2_controller_state_print(previous);
+	pigrrl2_controller_state_print(current);
 	buttonmask btn_release = previous->buttons & (~current->buttons);
 	buttonmask btn_pressed = (~previous->buttons) & current->buttons;
+	printf("Pressed: %d, Released: %d\nButtons:\n", btn_pressed, btn_release);
 	for (int btn = 0; btn < BTN_COUNT; btn++) {
-		if ((btn_release >> btn) & 1) {
+		printf(" Btn: %d ", btn);
+		uint16_t mask_check = 1 << btn;
+		if (btn_release & mask_check) {
+			printf("Released ");
 			emit(fd, EV_KEY, PIGRRL_BTN_MAP[btn][2], 0);
 		}
-		else if ((btn_pressed >> btn) & 1) {
-			emit(fd, EV_KEY, PIGRRL_BTN_MAP[btn][2], 0);
+		else if (btn_pressed & mask_check) {
+			emit(fd, EV_KEY, PIGRRL_BTN_MAP[btn][2], 1);
+			printf("Pressed ");
 		}
 	}
+	printf("\n");
 	emit(fd, EV_ABS, ABS_X, current->leftstick.x);
 	emit(fd, EV_ABS, ABS_Y, current->leftstick.y);
 	emit(fd, EV_ABS, ABS_RX, current->rightstick.x);

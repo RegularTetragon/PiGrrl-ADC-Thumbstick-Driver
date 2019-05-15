@@ -11,7 +11,7 @@ calibrator: ./bin/calibrator
 	./bin calibrator
 
 ./bin/pigrrld: $(PIGRRLD)
-	gcc -Wall -g -o ./bin/pigrrld ./src/pigrrld.c ./src/pigrrlread.c -lwiringPi
+	gcc -Wall -g -o ./bin/pigrrld ./src/pigrrld.c ./src/pigrrlread.c ./src/pigrrlout.c -lwiringPi
 
 ./bin/calibrator: $(PIGRRLREAD) 
 	gcc -Wall -g -o ./bin/calibrator ./src/pigrrlcalibrate.c ./src/pigrrlread.c -lwiringPi
