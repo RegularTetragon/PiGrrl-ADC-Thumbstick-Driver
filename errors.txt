@@ -1,0 +1,8 @@
+./src/pigrrld.c: In function 'writeChanges':
+./src/pigrrld.c:93:56: error: 'struct pigrrl2_controller_state' has no member named 'buttonmask'; did you mean 'buttons'?
+  buttonmask btn_release = previous->buttons & (~current->buttonmask);
+                                                        ^~
+./src/pigrrld.c:94:57: error: 'struct pigrrl2_controller_state' has no member named 'buttonmask'; did you mean 'buttons'?
+  buttonmask btn_pressed = (~previous->buttons) & current->buttonmask;
+                                                         ^~
+make: *** [bin/pigrrld] Error 1

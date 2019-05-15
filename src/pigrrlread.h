@@ -1,12 +1,9 @@
 
 #pragma once
 
-#ifdef __KERNEL__
-#include <linux/types.h>
-#else
 #include <inttypes.h>
-#endif
 #include <stdbool.h>
+#include <linux/input-event-codes.h>
 
 #define ADS_ADDRESS 0x48
 #define ADS_BASE 2222
@@ -48,23 +45,26 @@ static const int ADS_AXES[ADS_AXIS_COUNT] = { AXIS_X0, AXIS_Y0, AXIS_X1, AXIS_Y1
 #define BTN_MAP_KEY 1
 
 #define FRAME_PERIOD 8
-static const uint16_t PIGRRL_BTN_MAP[BTN_COUNT][2] = {
-	{4, 	PIGRRL_D_LEFT	},
-	{19, 	PIGRRL_D_RIGHT	},
-	{16,	PIGRRL_D_UP	},
-	{26,	PIGRRL_D_DOWN	},
-	{14,	PIGRRL_A	},
-	{15,	PIGRRL_B	},
-	{20,	PIGRRL_X	},
-	{18,	PIGRRL_Y	},
-	{5,	PIGRRL_SELECT  },
-	{6,	PIGRRL_START	},
-	{12,	PIGRRL_L	},
-	{13,	PIGRRL_R	},
-	{17,	PIGRRL_TFT_1	},
-	{22,	PIGRRL_TFT_2	},
-	{23,	PIGRRL_TFT_3	},
-	{24,	PIGRRL_TFT_4	}
+
+
+//GPIO pin, buttonmask position, 
+static const uint16_t PIGRRL_BTN_MAP[BTN_COUNT][3] = {
+	{4, 	PIGRRL_D_LEFT	,	BTN_DPAD_LEFT	},
+	{19, 	PIGRRL_D_RIGHT	,	BTN_DPAD_RIGHT	},
+	{16,	PIGRRL_D_UP	,	BTN_DPAD_UP	},
+	{26,	PIGRRL_D_DOWN	,	BTN_DPAD_DOWN	},
+	{14,	PIGRRL_A	,	BTN_A		},
+	{15,	PIGRRL_B	,	BTN_B		},
+	{20,	PIGRRL_X	,	BTN_X		},
+	{18,	PIGRRL_Y	,	BTN_Y		},
+	{5,	PIGRRL_SELECT	,	BTN_SELECT	},
+	{6,	PIGRRL_START	,	BTN_START	},
+	{12,	PIGRRL_L	,	BTN_TL		},
+	{13,	PIGRRL_R	,	BTN_TR		},
+	{17,	PIGRRL_TFT_1	,	BTN_MODE	},
+	{22,	PIGRRL_TFT_2	,	BTN_TL2		},
+	{23,	PIGRRL_TFT_3	,	BTN_TR2		},
+	{24,	PIGRRL_TFT_4	,	BTN_Z		}
 };
 
 
