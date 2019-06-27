@@ -11,6 +11,7 @@
 
 #include <inttypes.h>
 #include <stdbool.h>
+#include <sys/stat.h>
 
 
 void pigrrl2_config_default(struct pigrrl2_controller_config *out) {
@@ -24,16 +25,17 @@ void pigrrl2_config_default(struct pigrrl2_controller_config *out) {
 
 
 bool pigrrl2_config_save(struct pigrrl2_controller_config *config) {
-	int f = open(PIGRRL_CONFIG_PATH, O_WRONLY | O_TRUNC | O_CREAT, 0666);
+	mkdir(PIGRRL_CONFIG_PATH, 0777);
+	int f = open(PIGRRL_CONFIG_FILE, O_WRONLY | O_TRUNC | O_CREAT, 0777);
 	if (f) {
 		write(f, config, sizeof(struct pigrrl2_controller_config));
 		if (errno) {
-			fprintf(stderr, "Failed to write file %s. Error: %s.\n", PIGRRL_CONFIG_PATH, strerror(errno));
+			fprintf(stderr, "Failed to write file %s. Error: %s.\n", PIGRRL_CONFIG_FILE, strerror(errno));
 			return false;
 		}
 	}
 	else {
-		fprintf(stderr, "Failed to open file for writing %s. Error: %s.\n", PIGRRL_CONFIG_PATH, strerror(errno));
+		fprintf(stderr, "Failed to open file for writing %s. Error: %s.\n", PIGRRL_CONFIG_FILE, strerror(errno));
 		return false;
 	}
 	printf("Saved configuration to %s\n",PIGRRL_CONFIG_PATH);

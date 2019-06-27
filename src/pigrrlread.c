@@ -114,7 +114,7 @@ void pigrrl2_controller_read(struct pigrrl2_controller_state *out, struct pigrrl
 
 
 bool pigrrl2_config_load(struct pigrrl2_controller_config *config) {
-	int f = open(PIGRRL_CONFIG_PATH, O_RDONLY);
+	int f = open(PIGRRL_CONFIG_FILE, O_RDONLY);
 	if (f != -1) {
 		read(f, config, sizeof(struct pigrrl2_controller_config));
 		if (errno) {

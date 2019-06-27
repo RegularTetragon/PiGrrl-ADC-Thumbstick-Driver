@@ -91,25 +91,25 @@ void emit(int fd, int type, int code, int val) {
 }
 
 void writeChanges(int fd, struct pigrrl2_controller_state *previous, struct pigrrl2_controller_state *current) {
-	printf("Checking changes. Previous: \n");
-	pigrrl2_controller_state_print(previous);
-	pigrrl2_controller_state_print(current);
+	//printf("Checking changes. Previous: \n");
+	//pigrrl2_controller_state_print(previous);
+	//pigrrl2_controller_state_print(current);
 	buttonmask btn_release = previous->buttons & (~current->buttons);
 	buttonmask btn_pressed = (~previous->buttons) & current->buttons;
-	printf("Pressed: %d, Released: %d\nButtons:\n", btn_pressed, btn_release);
+	//printf("Pressed: %d, Released: %d\nButtons:\n", btn_pressed, btn_release);
 	for (int btn = 0; btn < BTN_COUNT; btn++) {
-		printf(" Btn: %d ", btn);
+		//printf(" Btn: %d ", btn);
 		uint16_t mask_check = 1 << btn;
 		if (btn_release & mask_check) {
-			printf("Released ");
+			//printf("Released ");
 			emit(fd, EV_KEY, PIGRRL_BTN_MAP[btn][2], 0);
 		}
 		else if (btn_pressed & mask_check) {
 			emit(fd, EV_KEY, PIGRRL_BTN_MAP[btn][2], 1);
-			printf("Pressed ");
+			//printf("Pressed ");
 		}
 	}
-	printf("\n");
+	//printf("\n");
 	emit(fd, EV_ABS, ABS_X, current->leftstick.x);
 	emit(fd, EV_ABS, ABS_Y, current->leftstick.y);
 	emit(fd, EV_ABS, ABS_RX, current->rightstick.x);

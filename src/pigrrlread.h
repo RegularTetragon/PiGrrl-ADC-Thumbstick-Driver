@@ -38,10 +38,12 @@ static const int ADS_AXES[ADS_AXIS_COUNT] = { AXIS_X0, AXIS_Y0, AXIS_X1, AXIS_Y1
 #define PIGRRL_TFT_3 	1 << 14
 #define PIGRRL_TFT_4 	1 << 15
 
-#define PIGRRL_CONFIG_PATH "./calibration.dat"
+#define PIGRRL_CONFIG_PATH "/etc/pigrrld"
+#define PIGRRL_CONFIG_FILE "/etc/pigrrld/calibration.dat"
+
 
 #define BTN_COUNT 16
-#define BTN_MAP_PIN 0
+#define BTN_MAP_PIN 0	
 #define BTN_MAP_KEY 1
 
 #define FRAME_PERIOD 8
